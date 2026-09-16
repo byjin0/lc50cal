@@ -18,4 +18,4 @@ Static, browser-based IC50 curve fitting tool for teaching.
 
 This repository is designed to run without a server. After enabling GitHub Pages from the `main` branch root, the app URL is:
 
-`https://elisbeth.github.io/lc50cal/`
+`https://byjin0.github.io/lc50cal/`
