@@ -60,12 +60,12 @@
       <div class="controls">
         <label>농도 단계
           <select id="doseCount">
-            <option>4</option><option>5</option><option>6</option><option selected>7</option><option>8</option><option>9</option><option>10</option><option>12</option>
+            <option>4</option><option selected>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>12</option>
           </select>
         </label>
         <label>Replicate 수
           <select id="repCount">
-            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option selected>6</option><option>7</option><option>8</option><option>10</option><option>12</option>
+            <option selected>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>10</option><option>12</option>
           </select>
         </label>
         <button id="makeTable" type="button">표 만들기</button>
@@ -327,8 +327,8 @@
   $('#fitBtn').addEventListener('click', () => {
     const pts=getPoints();
     const distinct=new Set(pts.map(p=>p.x)).size;
-    if(pts.length<6 || distinct<3){
-      status.textContent='서로 다른 log dose가 최소 3개 필요하며, 총 측정값은 6개 이상 입력해주세요.';
+    if(pts.length<4 || distinct<3){
+      status.textContent='서로 다른 log dose가 최소 3개 필요하며, 총 측정값은 4개 이상 입력해주세요.';
       results.classList.add('hidden'); return;
     }
     const {p,sse}=fit(pts);
