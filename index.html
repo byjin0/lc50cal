@@ -5,121 +5,76 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>IC50 Curve Fitter</title>
   <style>
-    :root {
-      --bg:#f7f8fa; --card:#ffffff; --text:#1f2937; --muted:#6b7280; --line:#d1d5db;
-      --primary:#2563eb; --primary-soft:#eff6ff; --curve:#dc2626; --point:#111827; --ok:#047857;
-    }
-    * { box-sizing: border-box; }
-    body { margin:0; font-family: Arial, "Noto Sans KR", sans-serif; color:var(--text); background:var(--bg); }
-    .wrap { max-width: 1120px; margin: 0 auto; padding: 24px 16px 48px; }
-    h1 { margin:0 0 6px; font-size:28px; }
-    .subtitle { margin:0 0 20px; color:var(--muted); line-height:1.5; }
-    .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:16px; }
-    .controls { display:flex; gap:12px; flex-wrap:wrap; align-items:end; }
-    label { display:block; font-size:14px; font-weight:700; }
-    select, input, button { font:inherit; }
-    select, input[type=number] { border:1px solid var(--line); border-radius:8px; background:#fff; min-height:42px; padding:8px 10px; }
-    select { margin-top:6px; min-width:120px; }
-    button { border:1px solid var(--line); background:#fff; border-radius:8px; min-height:42px; padding:9px 14px; cursor:pointer; font-weight:700; }
-    button.primary { border-color:var(--primary); background:var(--primary); color:#fff; }
-    button:hover { filter:brightness(.98); }
-    button:focus, input:focus, select:focus { outline:3px solid rgba(37,99,235,.18); outline-offset:1px; }
-    .help { color:var(--muted); font-size:13px; line-height:1.5; margin-top:10px; }
-    .table-scroll { overflow-x:auto; }
-    table { border-collapse:collapse; width:100%; min-width:720px; }
-    th, td { border-bottom:1px solid #e5e7eb; padding:8px; text-align:center; }
-    th { background:#f3f4f6; font-size:13px; position:sticky; top:0; }
-    td:first-child, th:first-child { width:52px; }
-    .data-input { width:112px; text-align:right; }
-    .actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    .status { color:var(--muted); font-size:14px; }
-    .results { display:grid; grid-template-columns:minmax(0,1.65fr) minmax(250px,.75fr); gap:16px; }
-    .chartbox { border:1px solid var(--line); border-radius:12px; padding:10px; background:#fff; }
-    svg { width:100%; height:auto; display:block; }
-    .metric { display:grid; grid-template-columns:1fr auto; gap:10px 16px; align-items:baseline; }
-    .metric dt { color:var(--muted); }
-    .metric dd { margin:0; font-weight:700; font-size:18px; }
-    .metric dd.big { font-size:28px; color:var(--primary); }
-    .modelnote { margin-top:14px; border-top:1px solid var(--line); padding-top:12px; color:var(--muted); font-size:13px; line-height:1.5; }
-    .equation { font-family: "Times New Roman", serif; font-size:15px; color:#374151; background:#f9fafb; padding:10px; border-radius:8px; margin-top:10px; overflow-x:auto; }
-    .hidden { display:none !important; }
-    .ok { color:var(--ok); }
-    @media (max-width: 760px) {
-      .results { grid-template-columns:1fr; }
-      .wrap { padding:16px 10px 36px; }
-      h1 { font-size:24px; }
-    }
+    :root{--bg:#f7f8fa;--card:#fff;--text:#1f2937;--muted:#6b7280;--line:#d1d5db;--primary:#2563eb;--curve:#dc2626;--point:#111827;--ok:#047857}
+    *{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans KR",sans-serif;color:var(--text);background:var(--bg)}
+    .wrap{max-width:1120px;margin:0 auto;padding:24px 16px 48px}h1{margin:0 0 6px;font-size:28px}.subtitle{margin:0 0 20px;color:var(--muted);line-height:1.5}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}.controls,.actions{display:flex;gap:12px;flex-wrap:wrap;align-items:end}
+    label{display:block;font-size:14px;font-weight:700}select,input,button{font:inherit}select,input[type=number]{border:1px solid var(--line);border-radius:8px;background:#fff;min-height:42px;padding:8px 10px}select{margin-top:6px;min-width:120px}
+    button{border:1px solid var(--line);background:#fff;border-radius:8px;min-height:42px;padding:9px 14px;cursor:pointer;font-weight:700}button.primary{border-color:var(--primary);background:var(--primary);color:#fff}
+    button:focus,input:focus,select:focus{outline:3px solid rgba(37,99,235,.18);outline-offset:1px}.help{color:var(--muted);font-size:13px;line-height:1.5;margin-top:10px}
+    .modelbanner{margin-top:12px;padding:10px 12px;border-radius:9px;background:#eff6ff;font-size:13px;line-height:1.55}.table-scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:520px}th,td{border-bottom:1px solid #e5e7eb;padding:8px;text-align:center}th{background:#f3f4f6;font-size:13px}.data-input{width:112px;text-align:right}
+    .status{color:var(--muted);font-size:14px}.results{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(250px,.75fr);gap:16px}.chartbox{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}svg{width:100%;height:auto;display:block}
+    .metric{display:grid;grid-template-columns:1fr auto;gap:10px 16px;align-items:baseline}.metric dt{color:var(--muted)}.metric dd{margin:0;font-weight:700;font-size:18px}.metric dd.big{font-size:28px;color:var(--primary)}
+    .modelnote{margin-top:14px;border-top:1px solid var(--line);padding-top:12px;color:var(--muted);font-size:13px;line-height:1.55}.equation{font-family:"Times New Roman",serif;font-size:15px;color:#374151;background:#f9fafb;padding:10px;border-radius:8px;margin-top:10px;overflow-x:auto}.hidden{display:none!important}.ok{color:var(--ok)}
+    @media(max-width:760px){.results{grid-template-columns:1fr}.wrap{padding:16px 10px 36px}h1{font-size:24px}}
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <h1>IC50 Curve Fitter</h1>
-    <p class="subtitle">가톨릭의대 약리학실습용 IC50 계산기입니다. Log dose와 % Vehicle 값만 입력하면 sigmoidal dose-response curve와 logIC50을 계산합니다.</p>
+<main class="wrap">
+  <h1>IC50 Curve Fitter</h1>
+  <p class="subtitle">가톨릭의대 약리학실습용 IC50 계산기입니다. Log dose와 % Vehicle 값을 입력하면 GraphPad Prism의 <b>log(inhibitor) vs. normalized response</b> 모델로 계산합니다.</p>
 
-    <section class="card">
-      <div class="controls">
-        <label>농도 단계
-          <select id="doseCount">
-            <option>4</option><option selected>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>12</option>
-          </select>
-        </label>
-        <label>Replicate 수
-          <select id="repCount">
-            <option selected>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>10</option><option>12</option>
-          </select>
-        </label>
-        <button id="makeTable" type="button">표 만들기</button>
-        <button id="exampleBtn" type="button">예시 데이터</button>
-        <button id="clearBtn" type="button">전체 지우기</button>
+  <section class="card">
+    <div class="controls">
+      <label>농도 단계
+        <select id="doseCount"><option>4</option><option selected>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>12</option></select>
+      </label>
+      <label>Replicate 수
+        <select id="repCount"><option selected>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>10</option><option>12</option></select>
+      </label>
+      <button id="makeTable" type="button">표 만들기</button>
+      <button id="exampleBtn" type="button">예시 데이터</button>
+      <button id="clearBtn" type="button">전체 지우기</button>
+    </div>
+    <div class="modelbanner"><b>Prism과 동일한 normalized-response 조건:</b> Top = 100, Bottom = 0, Hill slope = −1로 고정하고 <b>logIC50만 fitting</b>합니다.</div>
+    <div class="help">왼쪽 열에는 <b>log10(dose)</b>, 오른쪽에는 각 replicate의 <b>% Vehicle</b>을 입력하세요. 빈 replicate 칸은 무시됩니다.</div>
+  </section>
+
+  <section class="card">
+    <div class="table-scroll"><table id="dataTable" aria-label="IC50 data input"></table></div>
+    <div class="help">Excel에서 여러 셀을 복사해 첫 입력 칸에 붙여넣거나, 한 칸씩 직접 입력할 수 있습니다.</div>
+  </section>
+
+  <section class="card actions">
+    <button id="fitBtn" type="button" class="primary">곡선 맞추기</button>
+    <span id="status" class="status" aria-live="polite"></span>
+  </section>
+
+  <section id="results" class="results hidden">
+    <div class="chartbox"><svg id="chart" viewBox="0 0 700 420" role="img" aria-label="Dose response curve"></svg></div>
+    <div class="card" style="margin:0">
+      <dl class="metric">
+        <dt>logIC50</dt><dd id="logIC50" class="big">—</dd>
+        <dt>IC50</dt><dd id="IC50">—</dd>
+        <dt>Hill slope</dt><dd>−1.000 (fixed)</dd>
+        <dt>Top</dt><dd>100% (fixed)</dd>
+        <dt>Bottom</dt><dd>0% (fixed)</dd>
+        <dt>R²</dt><dd id="r2">—</dd>
+        <dt>n</dt><dd id="npts">—</dd>
+      </dl>
+      <div class="modelnote">
+        <b>GraphPad Prism model:</b> log(inhibitor) vs. normalized response
+        <div class="equation">Y = 100 / (1 + 10<sup>(X − LogIC50)</sup>)</div>
       </div>
-      <div class="help">왼쪽 열에는 <b>log10(dose)</b>, 오른쪽에는 각 replicate의 <b>% Vehicle</b>을 입력하세요. 빈 replicate 칸은 자동으로 무시됩니다.</div>
-    </section>
-
-    <section class="card">
-      <div class="table-scroll">
-        <table id="dataTable" aria-label="IC50 data input"></table>
-      </div>
-      <div class="help">Excel에서 여러 셀을 복사한 뒤 첫 입력 칸에 붙여넣어도 됩니다. 직접 한 칸씩 입력해도 됩니다.</div>
-    </section>
-
-    <section class="card actions">
-      <button id="fitBtn" type="button" class="primary">곡선 맞추기</button>
-      <span id="status" class="status" aria-live="polite"></span>
-    </section>
-
-    <section id="results" class="results hidden">
-      <div class="chartbox">
-        <svg id="chart" viewBox="0 0 700 420" role="img" aria-label="Dose response curve"></svg>
-      </div>
-      <div class="card" style="margin:0">
-        <dl class="metric">
-          <dt>logIC50</dt><dd id="logIC50" class="big">—</dd>
-          <dt>IC50</dt><dd id="IC50">—</dd>
-          <dt>Hill slope</dt><dd id="hill">—</dd>
-          <dt>Top</dt><dd id="top">—</dd>
-          <dt>R²</dt><dd id="r2">—</dd>
-          <dt>n</dt><dd id="npts">—</dd>
-        </dl>
-        <div class="modelnote">
-          <b>Model:</b> 3-parameter inhibitory dose-response<br>
-          Bottom = 0 fixed; Top, logIC50, and Hill slope are fitted by nonlinear least squares.
-          <div class="equation">Y = Top / (1 + 10<sup>((X − logIC50) × HillSlope)</sup>)</div>
-        </div>
-      </div>
-    </section>
-  </main>
-
+    </div>
+  </section>
+</main>
 <script>
 (() => {
-  const $ = (s) => document.querySelector(s);
-  const doseCount = $('#doseCount');
-  const repCount = $('#repCount');
-  const table = $('#dataTable');
-  const status = $('#status');
-  const results = $('#results');
+  const $=s=>document.querySelector(s), doseCount=$('#doseCount'), repCount=$('#repCount'), table=$('#dataTable'), status=$('#status'), results=$('#results');
 
-  const exampleX = [-0.511449, -0.204120, 0.096910, 0.397940, 0.698970, 1.000000, 1.301030];
-  const exampleY = [
+  const exampleX=[-0.511449,-0.204120,0.096910,0.397940,0.698970,1.000000,1.301030];
+  const exampleY=[
     [106.4984,103.5392,91.5881,91.0563,93.7783,82.6831],
     [96.5594,97.6238,93.8665,91.0563,81.4110,116.7030],
     [93.0382,96.5887,90.6714,89.4583,74.6967,65.8204],
@@ -129,226 +84,72 @@
     [33.3408,35.2332,35.5290,33.8728,26.3288,26.7430]
   ];
 
-  function buildTable(nDose = Number(doseCount.value), nRep = Number(repCount.value)) {
-    table.innerHTML = '';
-    const thead = document.createElement('thead');
-    const hr = document.createElement('tr');
-    ['#', 'Log dose', ...Array.from({length:nRep}, (_,i)=>`Rep ${i+1} (% Vehicle)`)].forEach(h => {
-      const th = document.createElement('th');
-      th.textContent = h;
-      hr.appendChild(th);
-    });
-    thead.appendChild(hr);
-    table.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
-    for (let r=0; r<nDose; r++) {
-      const tr = document.createElement('tr');
-      const idx = document.createElement('td');
-      idx.textContent = String(r+1);
-      tr.appendChild(idx);
-      for (let c=0; c<nRep+1; c++) {
-        const td = document.createElement('td');
-        const inp = document.createElement('input');
-        inp.type = 'number'; inp.step = 'any'; inp.inputMode = 'decimal';
-        inp.className = 'data-input';
-        inp.dataset.row = String(r); inp.dataset.col = String(c);
-        inp.placeholder = c===0 ? 'e.g. -0.51' : 'e.g. 95.2';
-        inp.setAttribute('aria-label', c===0 ? `Dose ${r+1} log dose` : `Dose ${r+1} replicate ${c}`);
-        td.appendChild(inp); tr.appendChild(td);
-      }
-      tbody.appendChild(tr);
-    }
-    table.appendChild(tbody);
-    results.classList.add('hidden');
-    status.textContent = '';
+  function buildTable(nDose=Number(doseCount.value),nRep=Number(repCount.value)){
+    table.innerHTML='';
+    const thead=document.createElement('thead'),hr=document.createElement('tr');
+    ['#','Log dose',...Array.from({length:nRep},(_,i)=>`Rep ${i+1} (% Vehicle)`)].forEach(h=>{const th=document.createElement('th');th.textContent=h;hr.appendChild(th)});
+    thead.appendChild(hr);table.appendChild(thead);
+    const tbody=document.createElement('tbody');
+    for(let r=0;r<nDose;r++){
+      const tr=document.createElement('tr'),idx=document.createElement('td');idx.textContent=String(r+1);tr.appendChild(idx);
+      for(let c=0;c<nRep+1;c++){
+        const td=document.createElement('td'),inp=document.createElement('input');inp.type='number';inp.step='any';inp.inputMode='decimal';inp.className='data-input';inp.dataset.row=r;inp.dataset.col=c;inp.placeholder=c===0?'e.g. -0.51':'e.g. 95.2';td.appendChild(inp);tr.appendChild(td);
+      }tbody.appendChild(tr);
+    }table.appendChild(tbody);results.classList.add('hidden');status.textContent='';
   }
+  const cell=(r,c)=>table.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+  $('#makeTable').addEventListener('click',()=>buildTable());
+  $('#clearBtn').addEventListener('click',()=>{table.querySelectorAll('input').forEach(el=>el.value='');results.classList.add('hidden');status.textContent=''});
+  $('#exampleBtn').addEventListener('click',()=>{doseCount.value='7';repCount.value='6';buildTable(7,6);for(let r=0;r<7;r++){cell(r,0).value=exampleX[r].toFixed(6);for(let c=1;c<=6;c++)cell(r,c).value=exampleY[r][c-1].toFixed(4)}status.textContent='예시 데이터를 불러왔습니다. “곡선 맞추기”를 누르세요.'});
 
-  function cell(r,c) { return table.querySelector(`input[data-row="${r}"][data-col="${c}"]`); }
-
-  $('#makeTable').addEventListener('click', () => buildTable());
-  $('#clearBtn').addEventListener('click', () => {
-    table.querySelectorAll('input').forEach(el => el.value = '');
-    results.classList.add('hidden'); status.textContent = '';
+  table.addEventListener('paste',e=>{
+    const target=e.target;if(!(target instanceof HTMLInputElement))return;
+    const text=e.clipboardData?.getData('text/plain');if(!text||(!text.includes('\t')&&!text.includes('\n')))return;e.preventDefault();
+    const matrix=text.trim().split(/\r?\n/).map(row=>row.split(/\t|,/)),sr=Number(target.dataset.row),sc=Number(target.dataset.col);
+    matrix.forEach((row,ri)=>row.forEach((v,ci)=>{const el=cell(sr+ri,sc+ci),n=Number(v.trim());if(el&&v.trim()!==''&&Number.isFinite(n))el.value=v.trim()}));
   });
 
-  $('#exampleBtn').addEventListener('click', () => {
-    doseCount.value = '7'; repCount.value = '6'; buildTable(7,6);
-    for (let r=0; r<7; r++) {
-      cell(r,0).value = exampleX[r].toFixed(6);
-      for (let c=1; c<=6; c++) cell(r,c).value = exampleY[r][c-1].toFixed(4);
+  function model(x,logIC50){return 100/(1+Math.pow(10,x-logIC50))}
+  function sse(logIC50,pts){let s=0;for(const p of pts){const d=p.y-model(p.x,logIC50);s+=d*d}return s}
+
+  // One-parameter minimization of SSE (Top=100, Bottom=0, Hill slope=-1 fixed).
+  function fitLogIC50(pts){
+    const xs=pts.map(p=>p.x);let a=Math.min(...xs)-6,b=Math.max(...xs)+6;
+    const phi=(1+Math.sqrt(5))/2;let c=b-(b-a)/phi,d=a+(b-a)/phi,fc=sse(c,pts),fd=sse(d,pts);
+    for(let i=0;i<220;i++){
+      if(fc<fd){b=d;d=c;fd=fc;c=b-(b-a)/phi;fc=sse(c,pts)}
+      else{a=c;c=d;fc=fd;d=a+(b-a)/phi;fd=sse(d,pts)}
     }
-    status.textContent = '예시 데이터를 불러왔습니다. “곡선 맞추기”를 누르세요.';
-  });
-
-  table.addEventListener('paste', (e) => {
-    const target = e.target;
-    if (!(target instanceof HTMLInputElement)) return;
-    const text = e.clipboardData?.getData('text/plain');
-    if (!text || (!text.includes('\t') && !text.includes('\n'))) return;
-    e.preventDefault();
-    const matrix = text.trim().split(/\r?\n/).map(row => row.split(/\t|,/));
-    const sr = Number(target.dataset.row), sc = Number(target.dataset.col);
-    matrix.forEach((row,ri) => row.forEach((v,ci) => {
-      const el = cell(sr+ri, sc+ci);
-      const n = Number(v.trim());
-      if (el && v.trim() !== '' && Number.isFinite(n)) el.value = v.trim();
-    }));
-  });
-
-  function model(x,p) {
-    const top = p[0], logIC50 = p[1], hill = Math.exp(p[2]);
-    return top / (1 + Math.pow(10, (x-logIC50)*hill));
+    return (a+b)/2;
   }
 
-  function loss(p, pts) {
-    const top=p[0], logIC=p[1], hill=Math.exp(p[2]);
-    if (!Number.isFinite(top+logIC+hill) || top<=0 || top>500 || logIC<-50 || logIC>50 || hill<0.005 || hill>100) return 1e100;
-    let s=0;
-    for (const q of pts) { const d=q.y-model(q.x,p); s += d*d; }
-    return s;
-  }
-
-  // Derivative-free nonlinear least-squares minimization of SSE.
-  function nelderMead(start, pts) {
-    const n=start.length;
-    const simplex=[start.slice()];
-    const steps=[Math.max(2,start[0]*0.03), 0.12, 0.12];
-    for(let i=0;i<n;i++){const p=start.slice();p[i]+=steps[i];simplex.push(p);}
-    let vals=simplex.map(p=>loss(p,pts));
-
-    for(let iter=0;iter<4000;iter++){
-      const ord=vals.map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v).map(z=>z.i);
-      const s2=ord.map(i=>simplex[i].slice()), v2=ord.map(i=>vals[i]);
-      for(let i=0;i<=n;i++){simplex[i]=s2[i];vals[i]=v2[i];}
-
-      const maxParamSpread = Math.max(...Array.from({length:n}, (_,j) => Math.max(...simplex.map(p=>p[j])) - Math.min(...simplex.map(p=>p[j]))));
-      if ((vals[n]-vals[0] < 1e-12) && maxParamSpread < 1e-8) break;
-
-      const centroid=Array(n).fill(0);
-      for(let i=0;i<n;i++) for(let j=0;j<n;j++) centroid[j]+=simplex[i][j]/n;
-      const worst=simplex[n];
-      const reflect=centroid.map((c,j)=>c+(c-worst[j]));
-      const fr=loss(reflect,pts);
-
-      if(fr<vals[0]){
-        const expand=centroid.map((c,j)=>c+2*(reflect[j]-c)); const fe=loss(expand,pts);
-        if(fe<fr){simplex[n]=expand;vals[n]=fe;} else {simplex[n]=reflect;vals[n]=fr;}
-      } else if(fr<vals[n-1]) {
-        simplex[n]=reflect; vals[n]=fr;
-      } else {
-        let contract;
-        if(fr<vals[n]) contract=centroid.map((c,j)=>c+0.5*(reflect[j]-c));
-        else contract=centroid.map((c,j)=>c+0.5*(worst[j]-c));
-        const fc=loss(contract,pts);
-        if(fc<Math.min(fr, vals[n])) { simplex[n]=contract; vals[n]=fc; }
-        else {
-          for(let i=1;i<=n;i++){
-            simplex[i]=simplex[0].map((b,j)=>b+0.5*(simplex[i][j]-b));
-            vals[i]=loss(simplex[i],pts);
-          }
-        }
-      }
-    }
-    const best=vals.indexOf(Math.min(...vals));
-    return simplex[best];
-  }
-
-  function getPoints() {
-    const pts=[]; const nD=Number(doseCount.value), nR=Number(repCount.value);
+  function getPoints(){
+    const pts=[],nD=Number(doseCount.value),nR=Number(repCount.value);
     for(let r=0;r<nD;r++){
-      const xEl=cell(r,0); const x=Number(xEl?.value);
-      if(!xEl || xEl.value.trim()==='' || !Number.isFinite(x)) continue;
-      for(let c=1;c<=nR;c++){
-        const yEl=cell(r,c); const y=Number(yEl?.value);
-        if(yEl && yEl.value.trim()!=='' && Number.isFinite(y)) pts.push({x,y});
-      }
-    }
-    return pts;
+      const xEl=cell(r,0),x=Number(xEl?.value);if(!xEl||xEl.value.trim()===''||!Number.isFinite(x))continue;
+      for(let c=1;c<=nR;c++){const yEl=cell(r,c),y=Number(yEl?.value);if(yEl&&yEl.value.trim()!==''&&Number.isFinite(y))pts.push({x,y})}
+    }return pts;
   }
 
-  function fit(pts) {
-    const xs=pts.map(p=>p.x), ys=pts.map(p=>p.y);
-    const sortedX=[...xs].sort((a,b)=>a-b);
-    const xMid=sortedX[Math.floor(sortedX.length/2)];
-    const top0=Math.max(60, Math.min(180, Math.max(...ys)));
-    const starts=[
-      [top0, xMid, Math.log(1)],
-      [100, xMid, Math.log(0.7)],
-      [100, xMid, Math.log(1.5)],
-      [top0, (Math.min(...xs)+Math.max(...xs))/2, Math.log(1)]
-    ];
-    let best=null, bestLoss=Infinity;
-    for(const st of starts){
-      const p=nelderMead(st,pts), L=loss(p,pts);
-      if(L<bestLoss){best=p;bestLoss=L;}
-    }
-    return {p:best, sse:bestLoss};
-  }
-
-  function draw(pts,p){
-    const svg=$('#chart'); svg.innerHTML='';
-    const W=700,H=420,L=66,R=22,T=22,B=58;
-    const xs=pts.map(q=>q.x), ys=pts.map(q=>q.y);
-    let xmin=Math.min(...xs), xmax=Math.max(...xs);
-    const padx=(xmax-xmin)*0.08 || 0.2; xmin-=padx; xmax+=padx;
-    const fittedTop=p[0];
-    let ymin=Math.min(0, Math.min(...ys)*0.90);
-    let ymax=Math.max(110, Math.max(...ys)*1.08, fittedTop*1.08);
-    const sx=x=>L+(x-xmin)/(xmax-xmin)*(W-L-R);
-    const sy=y=>T+(ymax-y)/(ymax-ymin)*(H-T-B);
-    const ns='http://www.w3.org/2000/svg';
-    const add=(tag,attrs,text)=>{const e=document.createElementNS(ns,tag);for(const[k,v]of Object.entries(attrs||{}))e.setAttribute(k,String(v));if(text!=null)e.textContent=text;svg.appendChild(e);return e;};
+  function draw(pts,logIC50){
+    const svg=$('#chart');svg.innerHTML='';const W=700,H=420,L=66,R=22,T=22,B=58,xs=pts.map(q=>q.x),ys=pts.map(q=>q.y);
+    let xmin=Math.min(...xs),xmax=Math.max(...xs);const padx=(xmax-xmin)*.08||.2;xmin-=padx;xmax+=padx;const ymin=Math.min(0,Math.min(...ys)*.9),ymax=Math.max(110,Math.max(...ys)*1.08);
+    const sx=x=>L+(x-xmin)/(xmax-xmin)*(W-L-R),sy=y=>T+(ymax-y)/(ymax-ymin)*(H-T-B),ns='http://www.w3.org/2000/svg';
+    const add=(tag,attrs,text)=>{const e=document.createElementNS(ns,tag);for(const[k,v]of Object.entries(attrs||{}))e.setAttribute(k,String(v));if(text!=null)e.textContent=text;svg.appendChild(e);return e};
     const line=(x1,y1,x2,y2,stroke,width=1)=>add('line',{x1,y1,x2,y2,stroke,'stroke-width':width});
-
-    for(let i=0;i<=5;i++){
-      const y=ymin+(ymax-ymin)*i/5, py=sy(y);
-      line(L,py,W-R,py,'#e5e7eb',1);
-      add('text',{x:L-9,y:py+4,'text-anchor':'end','font-size':12,fill:'#6b7280'},y.toFixed(0));
-    }
-    for(let i=0;i<=5;i++){
-      const x=xmin+(xmax-xmin)*i/5, px=sx(x);
-      add('text',{x:px,y:H-B+23,'text-anchor':'middle','font-size':12,fill:'#6b7280'},x.toFixed(2));
-    }
-    line(L,T,L,H-B,'#374151',1.4); line(L,H-B,W-R,H-B,'#374151',1.4);
-
-    let d='';
-    for(let i=0;i<=240;i++){
-      const x=xmin+(xmax-xmin)*i/240, y=model(x,p);
-      d+=(i?'L':'M')+sx(x).toFixed(2)+','+sy(y).toFixed(2);
-    }
-    add('path',{d,fill:'none',stroke:'#dc2626','stroke-width':3});
-    pts.forEach(q=>add('circle',{cx:sx(q.x),cy:sy(q.y),r:4.2,fill:'#111827',opacity:.72}));
-    add('text',{x:(L+W-R)/2,y:H-10,'text-anchor':'middle','font-size':14,fill:'#111827'},'Log dose');
-    const ylab=add('text',{x:16,y:(T+H-B)/2,'text-anchor':'middle','font-size':14,fill:'#111827'},'% Vehicle');
-    ylab.setAttribute('transform',`rotate(-90 16 ${(T+H-B)/2})`);
+    for(let i=0;i<=5;i++){const y=ymin+(ymax-ymin)*i/5,py=sy(y);line(L,py,W-R,py,'#e5e7eb');add('text',{x:L-9,y:py+4,'text-anchor':'end','font-size':12,fill:'#6b7280'},y.toFixed(0))}
+    for(let i=0;i<=5;i++){const x=xmin+(xmax-xmin)*i/5,px=sx(x);add('text',{x:px,y:H-B+23,'text-anchor':'middle','font-size':12,fill:'#6b7280'},x.toFixed(2))}
+    line(L,T,L,H-B,'#374151',1.4);line(L,H-B,W-R,H-B,'#374151',1.4);
+    let path='';for(let i=0;i<=240;i++){const x=xmin+(xmax-xmin)*i/240,y=model(x,logIC50);path+=(i?'L':'M')+sx(x).toFixed(2)+','+sy(y).toFixed(2)}
+    add('path',{d:path,fill:'none',stroke:'#dc2626','stroke-width':3});pts.forEach(q=>add('circle',{cx:sx(q.x),cy:sy(q.y),r:4.2,fill:'#111827',opacity:.72}));
+    add('text',{x:(L+W-R)/2,y:H-10,'text-anchor':'middle','font-size':14,fill:'#111827'},'Log dose');const yl=add('text',{x:16,y:(T+H-B)/2,'text-anchor':'middle','font-size':14,fill:'#111827'},'% Vehicle');yl.setAttribute('transform',`rotate(-90 16 ${(T+H-B)/2})`);
   }
 
-  $('#fitBtn').addEventListener('click', () => {
-    const pts=getPoints();
-    const distinct=new Set(pts.map(p=>p.x)).size;
-    if(pts.length<4 || distinct<3){
-      status.textContent='서로 다른 log dose가 최소 3개 필요하며, 총 측정값은 4개 이상 입력해주세요.';
-      results.classList.add('hidden'); return;
-    }
-    const {p,sse}=fit(pts);
-    const [top,logIC,logHill]=p, hill=Math.exp(logHill), ic50=Math.pow(10,logIC);
-    if(![top,logIC,hill,ic50,sse].every(Number.isFinite)){
-      status.textContent='곡선을 맞추지 못했습니다. 입력값을 확인해주세요.'; results.classList.add('hidden'); return;
-    }
-    const ys=pts.map(q=>q.y), mean=ys.reduce((a,b)=>a+b,0)/ys.length;
-    const sst=ys.reduce((s,y)=>s+(y-mean)**2,0);
-    const r2=sst>0 ? 1-sse/sst : NaN;
-
-    $('#logIC50').textContent=logIC.toFixed(4);
-    $('#IC50').textContent=ic50.toFixed(3);
-    $('#hill').textContent=hill.toFixed(3);
-    $('#top').textContent=top.toFixed(2)+'%';
-    $('#r2').textContent=Number.isFinite(r2)?r2.toFixed(4):'—';
-    $('#npts').textContent=String(pts.length);
-    draw(pts,p);
-    results.classList.remove('hidden');
-    status.innerHTML=`<span class="ok">${pts.length}개 측정값으로 fitting 완료</span>`;
+  $('#fitBtn').addEventListener('click',()=>{
+    const pts=getPoints(),distinct=new Set(pts.map(p=>p.x)).size;
+    if(pts.length<4||distinct<3){status.textContent='서로 다른 log dose가 최소 3개 필요하며, 총 측정값은 4개 이상 입력해주세요.';results.classList.add('hidden');return}
+    const logIC50=fitLogIC50(pts),ic50=Math.pow(10,logIC50),fitSSE=sse(logIC50,pts);const ys=pts.map(p=>p.y),mean=ys.reduce((a,b)=>a+b,0)/ys.length,sst=ys.reduce((s,y)=>s+(y-mean)**2,0),r2=sst>0?1-fitSSE/sst:NaN;
+    $('#logIC50').textContent=logIC50.toFixed(4);$('#IC50').textContent=ic50.toFixed(3);$('#r2').textContent=Number.isFinite(r2)?r2.toFixed(4):'—';$('#npts').textContent=String(pts.length);draw(pts,logIC50);results.classList.remove('hidden');status.innerHTML=`<span class="ok">${pts.length}개 측정값으로 Prism normalized-response fitting 완료</span>`;
   });
 
   buildTable();
