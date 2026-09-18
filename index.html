@@ -64,7 +64,9 @@
       </dl>
       <div class="modelnote">
         <b>GraphPad Prism model:</b> log(inhibitor) vs. normalized response
-        <div class="equation">Y = 100 / (1 + 10<sup>(X − LogIC50)</sup>)</div>
+        <div class="equation">E = Bottom + (Top − Bottom) / (1 + ([I] / IC₅₀)<sup>n</sup>)</div>
+        <div style="margin-top:8px">[I] = inhibitor concentration; IC₅₀ = inhibitor concentration giving a response halfway between Top and Bottom; n = Hill slope.</div>
+        <div style="margin-top:6px"><b>Note:</b> This form produces a descending sigmoid: response decreases as inhibitor concentration increases.</div>
       </div>
     </div>
   </section>
