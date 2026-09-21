@@ -4,6 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>IC50 Curve Fitter</title>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
   <style>
     :root{--bg:#f7f8fa;--card:#fff;--text:#1f2937;--muted:#6b7280;--line:#d1d5db;--primary:#2563eb;--curve:#dc2626;--point:#111827;--ok:#047857}
     *{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans KR",sans-serif;color:var(--text);background:var(--bg)}
@@ -15,7 +22,7 @@
     .modelbanner{margin-top:12px;padding:10px 12px;border-radius:9px;background:#eff6ff;font-size:13px;line-height:1.55}.table-scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:520px}th,td{border-bottom:1px solid #e5e7eb;padding:8px;text-align:center}th{background:#f3f4f6;font-size:13px}.data-input{width:112px;text-align:right}
     .status{color:var(--muted);font-size:14px}.results{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(250px,.75fr);gap:16px}.chartbox{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}svg{width:100%;height:auto;display:block}
     .metric{display:grid;grid-template-columns:1fr auto;gap:10px 16px;align-items:baseline}.metric dt{color:var(--muted)}.metric dd{margin:0;font-weight:700;font-size:18px}.metric dd.big{font-size:28px;color:var(--primary)}
-    .modelnote{margin-top:14px;border-top:1px solid var(--line);padding-top:12px;color:var(--muted);font-size:13px;line-height:1.55}.equation{font-family:"Times New Roman",serif;font-size:15px;color:#374151;background:#f9fafb;padding:10px;border-radius:8px;margin-top:10px;overflow-x:auto}.hidden{display:none!important}.ok{color:var(--ok)}
+    .modelnote{margin-top:14px;border-top:1px solid var(--line);padding-top:12px;color:var(--muted);font-size:13px;line-height:1.55}.equation{font-size:16px;color:#374151;background:#f9fafb;padding:10px 12px;border-radius:8px;margin-top:10px;overflow-x:auto;text-align:center}.equation mjx-container{margin:.25em 0!important}.hidden{display:none!important}.ok{color:var(--ok)}
     @media(max-width:760px){.results{grid-template-columns:1fr}.wrap{padding:16px 10px 36px}h1{font-size:24px}}
   </style>
 </head>
@@ -64,22 +71,41 @@
       </dl>
       <div class="modelnote">
         <b>GraphPad Prism model:</b> log(inhibitor) vs. normalized response
-        <div class="equation">Y = Bottom + (Top − Bottom) / (1 + 10<sup>((LogIC50 − X) × HillSlope)</sup>)</div>
-        <div class="equation">X = log<sub>10</sub>[I]</div>
-        <div class="equation">Y = Bottom + (Top − Bottom) / (1 + ([I] / IC₅₀)<sup>−HillSlope</sup>)</div>
-        <div style="margin-top:8px">For this calculator: Top = 100, Bottom = 0, HillSlope = −1, so <b>Y = 100 / (1 + [I] / IC₅₀)</b>.</div>
+        <div class="equation">\[
+          Y = Bottom + \frac{Top-Bottom}{1 + 10^{(LogIC50-X)\times HillSlope}}
+        \]</div>
+        <div class="equation">\[
+          X = \log_{10}[I]
+        \]</div>
+        <div class="equation">\[
+          Y = Bottom + \frac{Top-Bottom}{1 + \left(\frac{[I]}{IC_{50}}\right)^{-HillSlope}}
+        \]</div>
+        <div style="margin-top:8px">For this calculator: Top = 100, Bottom = 0, HillSlope = −1, so</div>
+        <div class="equation">\[
+          Y = \frac{100}{1 + \frac{[I]}{IC_{50}}}
+        \]</div>
 
         <details style="margin-top:12px">
           <summary style="cursor:pointer;font-weight:700;color:#374151">How is this related to the inhibitory Emax model?</summary>
           <div style="margin-top:10px;line-height:1.65">
             The inhibitory Emax model is
-            <div class="equation">E = E<sub>0</sub> − I<sub>max</sub>[C] / (IC₅₀ + [C])</div>
-            If the maximum inhibition equals the baseline response, so that <b>E<sub>0</sub> = I<sub>max</sub></b>, then
-            <div class="equation">E = E<sub>0</sub> − E<sub>0</sub>[C] / (IC₅₀ + [C])</div>
-            <div class="equation">E = E<sub>0</sub> × IC₅₀ / (IC₅₀ + [C])</div>
-            <div class="equation">E = E<sub>0</sub> / (1 + [C] / IC₅₀)</div>
-            Therefore, when <b>E<sub>0</sub> = 100</b>, the lower asymptote is 0, and <b>[C] = [I]</b>, this becomes
-            <div class="equation">E = 100 / (1 + [I] / IC₅₀)</div>
+            <div class="equation">\[
+              E = E_0 - \frac{I_{max}[C]}{IC_{50} + [C]}
+            \]</div>
+            If the maximum inhibition equals the baseline response, so that \(E_0 = I_{max}\), then
+            <div class="equation">\[
+              E = E_0 - \frac{E_0[C]}{IC_{50} + [C]}
+            \]</div>
+            <div class="equation">\[
+              E = \frac{E_0 IC_{50}}{IC_{50} + [C]}
+            \]</div>
+            <div class="equation">\[
+              E = \frac{E_0}{1 + \frac{[C]}{IC_{50}}}
+            \]</div>
+            Therefore, when \(E_0 = 100\), the lower asymptote is 0, and \([C] = [I]\), this becomes
+            <div class="equation">\[
+              E = \frac{100}{1 + \frac{[I]}{IC_{50}}}
+            \]</div>
             which is exactly the same form used by this calculator when Top = 100, Bottom = 0, and HillSlope = −1.
           </div>
         </details>
