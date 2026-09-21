@@ -64,9 +64,25 @@
       </dl>
       <div class="modelnote">
         <b>GraphPad Prism model:</b> log(inhibitor) vs. normalized response
-        <div class="equation">E = Bottom + (Top − Bottom) / (1 + ([I] / IC₅₀)<sup>n</sup>)</div>
-        <div style="margin-top:8px">[I] = inhibitor concentration; IC₅₀ = inhibitor concentration giving a response halfway between Top and Bottom; n = Hill slope.</div>
-        <div style="margin-top:6px"><b>Note:</b> This form produces a descending sigmoid: response decreases as inhibitor concentration increases.</div>
+        <div class="equation">Y = Bottom + (Top − Bottom) / (1 + 10<sup>((LogIC50 − X) × HillSlope)</sup>)</div>
+        <div class="equation">X = log<sub>10</sub>[I]</div>
+        <div class="equation">Y = Bottom + (Top − Bottom) / (1 + ([I] / IC₅₀)<sup>−HillSlope</sup>)</div>
+        <div style="margin-top:8px">For this calculator: Top = 100, Bottom = 0, HillSlope = −1, so <b>Y = 100 / (1 + [I] / IC₅₀)</b>.</div>
+
+        <details style="margin-top:12px">
+          <summary style="cursor:pointer;font-weight:700;color:#374151">How is this related to the inhibitory Emax model?</summary>
+          <div style="margin-top:10px;line-height:1.65">
+            The inhibitory Emax model is
+            <div class="equation">E = E<sub>0</sub> − I<sub>max</sub>[C] / (IC₅₀ + [C])</div>
+            If the maximum inhibition equals the baseline response, so that <b>E<sub>0</sub> = I<sub>max</sub></b>, then
+            <div class="equation">E = E<sub>0</sub> − E<sub>0</sub>[C] / (IC₅₀ + [C])</div>
+            <div class="equation">E = E<sub>0</sub> × IC₅₀ / (IC₅₀ + [C])</div>
+            <div class="equation">E = E<sub>0</sub> / (1 + [C] / IC₅₀)</div>
+            Therefore, when <b>E<sub>0</sub> = 100</b>, the lower asymptote is 0, and <b>[C] = [I]</b>, this becomes
+            <div class="equation">E = 100 / (1 + [I] / IC₅₀)</div>
+            which is exactly the same form used by this calculator when Top = 100, Bottom = 0, and HillSlope = −1.
+          </div>
+        </details>
       </div>
     </div>
   </section>
